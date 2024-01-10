@@ -1,8 +1,42 @@
+### 
+ # file            spotify.py
+ # authors         Robert McManus
+ # github          @remcmanu
+ # date            2023-1-11
+ # description     A program to analyze spotify data.
+ #
+ # sources:
+ #
+###
+
 # created 9-16-21 while procrastinating much work
 # updated 1-12-22 while on break, procrastinating some work
 
 import json
 from datetime import date
+from cmd import Cmd
+
+
+class MyPrompt(Cmd):
+  prompt = ""
+  intro = "Type ? to list commands"
+
+  def do_exit (self, input):
+    return True
+
+  def help_exit (self):
+    print ("exit application. Shorthand: x q Ctrl-D.")
+
+  def do_create_files (self, input):
+    print (self)
+    print (input)
+  
+  def help_create_files (self):
+    print ("Turns StreamingHistory files into .json files sorted by year.")
+  
+  do_EOF = do_exit
+  help_EOF = help_exit
+
 
 
 def songs_sum(year1, mode="lifetime", decimal_place=2):
@@ -78,4 +112,5 @@ def artists_sum(year1, mode="lifetime", decimal_place=2):
     print("    " + str(round(i[1], decimal_place)) + "ms", str(round(i[1] / 60000, decimal_place)) + "m", str(round(i[1] / 3600000, decimal_place)) + "h")
   print("TOTAL: ", str(round(total / 86400000, decimal_place)) + "d")
 
-songs_sum(2020)
+if __name__ == '__main__':
+  MyPrompt().cmdloop()
