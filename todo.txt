@@ -1,0 +1,9 @@
++ streaming history analysis
+    can this replace my other scripts?
+    time sorting with one of those draggable bars
++ playlist algebra
+    and
+    or
+    not
+
+should I switch to SQL, Express, Angular, Node.js???

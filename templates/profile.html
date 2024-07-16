@@ -1,0 +1,157 @@
+<!-- templates/profile.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ username }}'s Profile</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        header {
+            background-color: #1DB954;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+        .profile-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+        }
+        .profile-image {
+            border-radius: 50%;
+            margin-bottom: 1rem;
+        }
+        .profile-info {
+            text-align: center;
+        }
+        .top-items-container {
+            margin-top: 2rem;
+            text-align: center;
+        }
+        .top-items-form {
+            margin-bottom: 2rem;
+        }
+        .top-items {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .top-item {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin: 1rem;
+            padding: 1rem;
+            text-align: center;
+            width: 200px;
+        }
+        .top-item img {
+            border-radius: 8px;
+            max-width: 100%;
+        }
+        .top-item a {
+            color: #1DB954;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .top-item a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>{{ username }}'s Profile</h1>
+    </header>
+    <div class="profile-container">
+        <img src="{{ user_profile_image }}" alt="Profile Image" class="profile-image" width="150">
+        <div class="profile-info">
+            <p>Username: {{ username }}</p>
+            <p id="user-country">{{ user_country }}</p>
+            <p>Followers: {{ user_follower_count }}</p>
+            <p><a href="{{ user_profile_link }}" target="_blank">Spotify Profile</a></p>
+        </div>
+        <div class="top-items-container">
+            <form class="top-items-form" id="top-items-form">
+                <label for="item-type">Choose what to display:</label>
+                <select id="item-type" name="item-type">
+                    <option value="tracks">Top Tracks</option>
+                    <option value="artists">Top Artists</option>
+                </select>
+                <label for="item-count">Number of items:</label>
+                <select id="item-count" name="item-count">
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                </select>
+                <label for="time-range">Time Range:</label>
+                <select id="time-range" name="time-range">
+                    <option value="short_term">Short Term</option>
+                    <option value="medium_term">Medium Term</option>
+                    <option value="long_term">Long Term</option>
+                </select>
+                <button type="submit">Get Top Items</button>
+            </form>
+            <div class="top-items" id="top-items"></div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('top-items-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const itemType = document.getElementById('item-type').value;
+            const itemCount = document.getElementById('item-count').value;
+            const timeRange = document.getElementById('time-range').value;
+            fetch('/get_top_items', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    item_type: itemType,
+                    limit: itemCount,
+                    time_range: timeRange
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const topItemsContainer = document.getElementById('top-items');
+                topItemsContainer.innerHTML = '';
+                data.forEach(item => {
+                    const itemElement = document.createElement('div');
+                    itemElement.classList.add('top-item');
+                    itemElement.innerHTML = `
+                        <img src="${item.images[0]['url']}" alt="${item.name}">
+                        <a href="${item.url}" target="_blank">${item.name}</a>
+                    `;
+                    topItemsContainer.appendChild(itemElement);
+                });
+            })
+            .catch(error => console.error('Error fetching top items:', error));
+        });
+
+        // Credit: https://dev.to/jorik/country-code-to-flag-emoji-a21
+        function getFlagEmoji(countryCode) {
+            const codePoints = countryCode
+                .toUpperCase()
+                .split('')
+                .map(char => 127397 + char.charCodeAt(0));
+            return String.fromCodePoint(...codePoints);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const userCountryElement = document.getElementById('user-country');
+            const userCountry = userCountryElement.textContent.trim();
+            userCountryElement.innerHTML = `${userCountry} ${getFlagEmoji(userCountry)}`;
+        });
+    </script>
+</body>
+</html>

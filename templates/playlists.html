@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{data['username']}}'s Playlists</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        header {
+            background-color: #1DB954;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+        .playlist-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .playlist {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin: 1rem;
+            padding: 1rem;
+            text-align: center;
+            width: 200px;
+        }
+        .playlist img {
+            border-radius: 8px;
+            max-width: 100%;
+        }
+        .playlist a {
+            color: #1DB954;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .playlist a:hover {
+            text-decoration: underline;
+        }
+        .create-playlist-btn {
+            background-color: #1DB954;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+        .create-playlist-btn:hover {
+            background-color: #128d3d;
+        }
+
+    </style>
+</head>
+<body>
+    <header>
+        <h1>{{data['username']}}'s Playlists</h1>
+    </header>
+    <div class="playlist-container">
+        <!-- LATER: perhaps programmatically decide which image of the 3 to use based on size -->
+        {% for playlist in data['playlists_info'] %}
+        <div class="playlist">
+            <img src="{{playlist['images'][0]['url']}}" alt="Playlist Image"> 
+            <a href="{{playlist['url']}}">{{playlist['name']}}</a>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="playlist-container">
+        <a href="/playlist-creator" class="create-playlist-btn">Create A Playlist</a>
+    </div>
+</body>
+</html>

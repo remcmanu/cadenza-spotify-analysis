@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Playlist Creator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        header {
+            background-color: #1DB954;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+        .playlist-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .playlist {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin: 1rem;
+            padding: 1rem;
+            text-align: center;
+            width: 200px;
+        }
+        .playlist img {
+            border-radius: 8px;
+            max-width: 100%;
+        }
+        .playlist a {
+            color: #1DB954;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .playlist a:hover {
+            text-decoration: underline;
+        }
+        .create-playlist-btn {
+            background-color: #1DB954;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+        .create-playlist-btn:hover {
+            background-color: #128d3d;
+        }
+
+        .box {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 20px;
+            overflow: auto;
+            max-height: 200px; /* Adjust height as needed */
+        }
+
+        .draggable-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 5px;
+            background-color: #f2f2f2;
+            border: 1px solid #ddd;
+            cursor: move;
+        }
+
+        .draggable-item img {
+            width: 50px; /* Adjust size of playlist icon */
+            height: 50px;
+            margin-right: 10px;
+        }
+        #operators {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        #operators .draggable-item {
+            padding: 10px 20px;
+            background-color: #f2f2f2;
+            border: 1px solid #ddd;
+            cursor: move;
+        }
+
+        #equation-builder {
+            border: 2px dashed #1DB954;
+            padding: 20px;
+            min-height: 100px;
+            white-space: nowrap; /* Prevent items from wrapping to a new line */
+            overflow-x: auto; /* Enable horizontal scrolling if needed */
+        }
+
+        .playlist-item {
+            display: inline-block; /* Display items horizontally */
+            margin-right: 10px; /* Adjust spacing between items */
+            padding: 10px;
+            background-color: #f2f2f2;
+            border: 1px solid #ddd;
+            white-space: normal; /* Allow item content to wrap if necessary */
+        }
+
+    </style>
+</head>
+<body>
+    <header>
+        <h1>{{data['username']}}'s Playlists</h1>
+    </header>
+
+    <div class="playlist-container">
+        <!-- LATER: perhaps programmatically decide which image of the 3 to use based on size -->
+        {% for playlist in data['playlists_info'] %}
+        <div class="playlist" class="draggable-item" draggable="true">
+            <img src="{{playlist['images'][0]['url']}}" alt="Playlist Image" draggable="false"> 
+            <a href="{{playlist['url']}}">{{playlist['name']}}</a>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="box" id="operators">
+        <div class="draggable-item" draggable="true">AND</div>
+        <div class="draggable-item" draggable="true">OR</div>
+        <div class="draggable-item" draggable="true">NOT</div>
+    </div>
+
+    <div class="box" id="equation-builder" ondrop="drop(event)" ondragover="allowDrop(event)">
+        <!-- Drop zone for equation items -->
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const draggableItems = document.querySelectorAll('.draggable-item');
+
+            draggableItems.forEach(item => {
+                item.addEventListener('dragstart', dragStart);
+            });
+
+            function dragStart(event) {
+                event.dataTransfer.setData('text/plain', event.target.outerHTML);
+            }
+            
+            const equationBuilder = document.getElementById('equation-builder');
+
+            equationBuilder.addEventListener('drop', drop);
+            equationBuilder.addEventListener('dragover', allowDrop);
+            equationBuilder.addEventListener('dragstart', dragStart);
+
+            function allowDrop(event) {
+                event.preventDefault();
+            }
+
+            function drop(event) {
+                event.preventDefault();
+                const data = event.dataTransfer.getData('text/plain');
+                const playlistItem = document.createElement('div');
+                playlistItem.classList.add('playlist-item');
+                playlistItem.innerHTML = data;
+                event.target.appendChild(playlistItem);
+            }
+
+            document.addEventListener('dragstart', function(event) {
+                if (event.target.closest('#equation-builder')) {
+                    event.target.addEventListener('dragend', function() {
+                        event.target.parentNode.removeChild(event.target);
+                    });
+                }
+            });
+        });
+
+    </script>
+
+</body>
+</html>
