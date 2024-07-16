@@ -1,1 +1,4 @@
 venv/ .vscode/
+.env
+*.csv
+/venv
